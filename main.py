@@ -3,6 +3,17 @@ from dataclasses import dataclass
 import random
 from bakery import assert_equal
 
+set_website_title("Romance Generator")
+set_site_information(
+    author="Keira Fidgeon",
+    description="Generates a book based off selected characteristics",
+    sources="Drafter Docs",
+    planning=["CS1 Final Project 1: Design.pdf",'CS1 Final Project 0: Pick a Problem.pdf'],
+    links=[]
+)
+hide_debug_information()
+set_website_framed(False)
+
 @dataclass
 class Book:
     title:str
