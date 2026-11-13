@@ -8,7 +8,7 @@ set_site_information(
     author="Keira Fidgeon",
     description="Generates a book based off selected characteristics",
     sources="Drafter Docs",
-    planning=["CS1 Final Project 1: Design.pdf",'CS1 Final Project 0: Pick a Problem.pdf'],
+    planning=["CS1 Final Project 1_ Design.pdf",'CS1 Final Project 0_ Pick a Problem.pdf'],
     links=[]
 )
 hide_debug_information()
