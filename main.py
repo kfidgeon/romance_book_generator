@@ -14,6 +14,7 @@ set_site_information(
 hide_debug_information()
 set_website_framed(False)
 
+
 @dataclass
 class Book:
     title:str
@@ -541,7 +542,9 @@ assert_equal(
 @route
 def index(state:State)->Page:
     '''
-    home page, user clicks start button to start
+    Displays the home page of the Romance Book Generator.
+    Introduces the website and gives the user a Start button
+    that takes them to the genre selection page.
     '''
     return Page(state,[
         Header("♡ Romance Book Generator ♡ "),
@@ -555,9 +558,14 @@ def index(state:State)->Page:
 @route
 def genre_page(state:State)->Page:
     '''
-    users pick their favorite genres from checkboxes and it gets saved into selected_genres
+    Displays a list of romance genres using checkboxes.
+    Allows the user to select multiple genres that they would
+    like to see in their book recommendation.
+    When the user clicks Continue, their selections are sent
+    to the save_genres function
     the RelatedCheckBox allows users to pick multiple genres
     * puts all the gerneated checkboxes into the page as separate components
+    
     '''
     return(Page(state, [
         Header("Choose Your Favorite Genres!"),
@@ -623,6 +631,12 @@ def genre_page(state:State)->Page:
 
 @route
 def save_genres(state: State, picks: list[str]) -> Page:
+    '''
+    Saves the genres selected by the user into the selected_genres
+    list in the State dataclass. If the user does not select any
+    genres, all available genres are selected by default.
+    Then, takes the user to the trope selection page.
+    '''
     if len(picks) == 0:
         state.selected_genres = GENRES
     else:
@@ -632,7 +646,11 @@ def save_genres(state: State, picks: list[str]) -> Page:
 @route
 def trope_page(state:State)->Page:
     '''
-    users pick their favorite tropes from checkboxes and it gets saved into selected_genres
+     Displays a list of romance tropes using checkboxes.
+    Allows the user to select multiple tropes they would
+    like included in their book recommendation.
+    When the user clicks Find My Book, their selections
+    are sent to the save_tropes function
     the RelatedCheckBox allows users to pick multiple genres
     * puts all the gerneated checkboxes into the page as separate components
     '''
@@ -716,6 +734,12 @@ def trope_page(state:State)->Page:
 
 @route
 def save_tropes(state: State, picks: list[str]) -> Page:
+    '''
+    Saves the tropes selected by the user into the selected_tropes
+    list in the State dataclass. If the user does not select any
+    tropes, all available tropes are selected by default.
+    Then, takes the user to the recommendation page.
+    '''
     if len(picks) == 0:
         state.selected_tropes = TROPES
     else:
@@ -724,6 +748,16 @@ def save_tropes(state: State, picks: list[str]) -> Page:
 
 @route
 def recommendation_page(state:State)->Page:
+    '''
+    Filters the books based on the user's selected genres and tropes.
+    If no books match the user's preferences, displays a message
+    explaining that there are no matching books and provides a
+    button to start over.
+    If matching books are found, randomly selects one book and
+    displays its title, author, genres, and tropes.
+    Also gives the user the option to get another recommendation
+    or return to the home page.
+    '''
     matching_books = filter_books(
         state.books,
         state.selected_genres,
@@ -755,6 +789,12 @@ def recommendation_page(state:State)->Page:
 
 @route
 def new_recommendation_page(state: State) -> Page:
+    '''
+    Generates a new book recommendation by calling the
+    recommendation_page function again. The function uses
+    the user's previously selected genres and tropes to
+    find another random book that matches their preferences.
+    '''
     return recommendation_page(state)
 
 from bakery import assert_equal
