@@ -6,8 +6,9 @@ import random
 class Book:
     title:str
     author:str
-    tropes:list[str]
     genres:list[str]
+    tropes:list[str]
+    
     
 @dataclass
 class State:
@@ -15,6 +16,64 @@ class State:
     selected_genres: list[str]
     selected_tropes: list[str]
     recommended_book: Book | None
+
+
+add_website_css("body", """
+    background-color: #fff0f5;
+    color: #71334d;
+    font-family: Georgia, serif;
+""")
+
+add_website_css("h1, h2, h3", """
+    color: #d63384;
+    text-align: center;
+""")
+
+add_website_css("button", """
+    background-color: #f4a6c1;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    padding: 12px 22px;
+    font-size: 16px;
+    cursor: pointer;
+""")
+
+add_website_css("button:hover", """
+    background-color: #e75480;
+""")
+
+add_website_css("input[type='checkbox']", """
+    accent-color: #e75480;
+""")
+
+add_website_css("button", """
+    background-color: #f4a6c1 !important;
+    color: white !important;
+    border: none;
+    border-radius: 20px;
+    padding: 12px 22px;
+    font-size: 16px;
+""")
+
+add_website_css("button:hover", """
+    background-color: #e75480 !important;
+""")
+
+add_website_css("button", """
+    display: block;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    background-color: #f4a6c1 !important;
+    color: white !important;
+    border: none;
+    border-radius: 20px;
+    padding: 12px 22px;
+""")
+
+add_website_css("div:has(> button)", """
+    text-align: center;
+""")
 
 books = [
     Book("The Love Hypothesis", "Ali Hazelwood", ["Contemporary Romance"], ["Fake Dating", "Grumpy x Sunshine", "Forced Proximity"]),
@@ -79,7 +138,6 @@ books = [
     Book("The Ex Talk", "Rachel Lynn Solomon", ["Contemporary Romance"], ["Fake Dating", "Workplace Romance", "Enemies to Lovers"]),
     Book("See You Yesterday", "Rachel Lynn Solomon", ["Young Adult Romance", "Science Fiction Romance"], ["Enemies to Lovers", "Forced Proximity"]),
     Book("A Cuban Girl's Guide to Tea and Tomorrow", "Laura Taylor Namey", ["Young Adult Romance"], ["Opposites Attract", "Small-Town Romance"]),
-    Book("The Do-Over", "Lynn Painter", ["Young Adult Romance"], ["Second Chance Romance", "Slow Burn"]),
     Book("Tweet Cute", "Emma Lord", ["Young Adult Romance", "Romantic Comedy"], ["Enemies to Lovers", "Rivals to Lovers"]),
     Book("You Have a Match", "Emma Lord", ["Young Adult Romance"], ["Friends to Lovers", "Slow Burn"]),
     Book("The Start of Me and You", "Emery Lord", ["Young Adult Romance"], ["Friends to Lovers", "Slow Burn"]),
@@ -346,9 +404,7 @@ books = [
     Book("The Gift", "Julie Garwood", ["Historical Romance"], ["Arranged Marriage", "Opposites Attract"]),
     Book("The Wedding", "Julie Garwood", ["Historical Romance"], ["Marriage of Convenience", "Opposites Attract"]),
     Book("The Bride Test", "Helen Hoang", ["Contemporary Romance"], ["Arranged Marriage", "Opposites Attract"]),
-    Book("The Flatshare", "Beth O'Leary", ["Contemporary Romance"], ["Forced Proximity", "Slow Burn"]),
     Book("The Kiss Quotient", "Helen Hoang", ["Contemporary Romance"], ["Opposites Attract", "Slow Burn"]),
-    Book("The Love Hypothesis", "Ali Hazelwood", ["Contemporary Romance"], ["Fake Dating", "Workplace Romance"]),
     Book("The Hating Game", "Sally Thorne", ["Contemporary Romance"], ["Enemies to Lovers", "Workplace Romance"]),
     Book("Beach Read", "Emily Henry", ["Contemporary Romance"], ["Rivals to Lovers", "Forced Proximity"]),
     Book("People We Meet on Vacation", "Emily Henry", ["Contemporary Romance"], ["Friends to Lovers", "Slow Burn"]),
@@ -364,7 +420,364 @@ books = [
     Book("Cemetery Boys", "Aiden Thomas", ["Young Adult Romance", "Fantasy Romance", "LGBTQ+ Romance"], ["Opposites Attract", "Forced Proximity"]),
 ]
 
+    
 
+GENRES = [
+    "Contemporary Romance",
+    "Historical Romance",
+    "Fantasy Romance",
+    "Paranormal Romance",
+    "Romantic Comedy",
+    "Young Adult Romance",
+    "LGBTQ+ Romance",
+    "Romantic Suspense",
+    "Science Fiction Romance",
+    "Gothic Romance",
+    "Small-Town Romance",
+    "Holiday Romance",
+    "Dystopian Romance",
+    "Contemporary Fiction"
+]
+
+TROPES = [
+    "Enemies to Lovers",
+    "Friends to Lovers",
+    "Rivals to Lovers",
+    "Grumpy x Sunshine",
+    "Opposites Attract",
+    "Forced Proximity",
+    "Fake Dating",
+    "Fake Engagement",
+    "Marriage of Convenience",
+    "Arranged Marriage",
+    "Second Chance Romance",
+    "Slow Burn",
+    "Love Triangle",
+    "Forbidden Love",
+    "Friends with Benefits",
+    "One Bed",
+    "He Falls First",
+    "She Falls First",
+    "Mutual Pining",
+    "Found Family",
+    "Small-Town Romance",
+    "Secret Identity",
+    "Single Parent",
+    "Bodyguard Romance",
+    "Love at First Sight",
+    "Celebrity Romance",
+    "Time Travel",
+    "Pen Pals",
+    "Unexpected Romance",
+    "First Love",
+    "Love After Loss",
+    "Coming of Age",
+    "Family",
+    "Adventure",
+    "True Love",
+    "Royal Romance",
+    "Fated Mates",
+    "Mystery",
+    "Star-Crossed Lovers",
+    "Musician Romance",
+    "Marriage in Trouble",
+    "Healing Together",
+    "New Beginnings",
+    "Summer Romance",
+    "Workplace Romance",
+    "Holiday Romance"
+]
+
+
+def filter_books(books,selected_genres,selected_tropes):
+    '''
+    matching_books creates an empty listn to store books that match the users prefrences
+    the first for loop checks every book
+    the second loop checks whether the book has any of the user's selected genres
+    the third loop checks whether the book has any of the user's selectedn tropes
+    the if statement only adds books that match at least one selected genres and trope
+    '''
+    matching_books = []
+    
+    for book in books:
+        genre_match=False
+        trope_match=False
+        
+        for genre in selected_genres:
+            if genre in book.genres:
+                genre_match=True
+        
+        for trope in selected_tropes:
+            if trope in book.tropes:
+                trope_match=True
+        
+        if genre_match and trope_match:
+            matching_books.append(book)
+    
+    return matching_books
+
+assert_equal(
+    filter_books(books, ["Contemporary Romance"], ["Enemies to Lovers"]),
+    [book for book in books if "Contemporary Romance" in book.genres
+     and "Enemies to Lovers" in book.tropes]
+)
+
+assert_equal(
+    filter_books(books, ["Nonexistent Genre"], ["Nonexistent Trope"]),
+    [])
+
+@route
+def index(state:State)->Page:
+    '''
+    home page, user clicks start button to start
+    '''
+    return Page(state,[
+        Header("♡ Romance Book Generator ♡ "),
+        "Can't decide what to read next? Let us pick a random book for you!",
+        "\n",
+        "Choose your favorite genres and tropes to get a random recommendation!💗",
+        "\n",
+        Button("Start!","genre_page")
+        ])
+
+@route
+def genre_page(state:State)->Page:
+    '''
+    users pick their favorite genres from checkboxes and it gets saved into selected_genres
+    the RelatedCheckBox allows users to pick multiple genres
+    * puts all the gerneated checkboxes into the page as separate components
+    '''
+    return(Page(state, [
+        Header("Choose Your Favorite Genres!"),
+        "Select all the genres you would want in a book <3:",
+        "\n",
+    RelatedCheckBox("picks", "Contemporary Romance"),
+        "Contemporary Romance",
+
+        RelatedCheckBox("picks", "Historical Romance"),
+        "Historical Romance",
+
+        RelatedCheckBox("picks", "Fantasy Romance"),
+        "Fantasy Romance",
+
+        RelatedCheckBox("picks", "Paranormal Romance"),
+        "Paranormal Romance",
+
+        RelatedCheckBox("picks", "Romantic Comedy"),
+        "Romantic Comedy",
+
+        RelatedCheckBox("picks", "Young Adult Romance"),
+        "Young Adult Romance",
+
+        RelatedCheckBox("picks", "New Adult Romance"),
+        "New Adult Romance",
+
+        RelatedCheckBox("picks", "LGBTQ+ Romance"),
+        "LGBTQ+ Romance",
+
+        RelatedCheckBox("picks", "Romantic Suspense"),
+        "Romantic Suspense",
+
+        RelatedCheckBox("picks", "Dark Romance"),
+        "Dark Romance",
+
+        RelatedCheckBox("picks", "Sports Romance"),
+        "Sports Romance",
+
+        RelatedCheckBox("picks", "Science Fiction Romance"),
+        "Science Fiction Romance",
+
+        RelatedCheckBox("picks", "Gothic Romance"),
+        "Gothic Romance",
+
+        RelatedCheckBox("picks", "Small-Town Romance"),
+        "Small-Town Romance",
+
+        RelatedCheckBox("picks", "Workplace Romance"),
+        "Workplace Romance",
+
+        RelatedCheckBox("picks", "Western Romance"),
+        "Western Romance",
+
+        RelatedCheckBox("picks", "Holiday Romance"),
+        "Holiday Romance",
+
+        RelatedCheckBox("picks", "Dystopian Romance"),
+        "Dystopian Romance",
+        "\n",
+
+        Button("Continue", "save_genres")
+    ]))
+
+@route
+def save_genres(state: State, picks: list[str]) -> Page:
+    if len(picks) == 0:
+        state.selected_genres = GENRES
+    else:
+        state.selected_genres = picks
+    return trope_page(state)
+
+@route
+def trope_page(state:State)->Page:
+    '''
+    users pick their favorite tropes from checkboxes and it gets saved into selected_genres
+    the RelatedCheckBox allows users to pick multiple genres
+    * puts all the gerneated checkboxes into the page as separate components
+    '''
+    return(Page(state, [
+        Header("Choose Your Favorite Tropes!"),
+        "Select all the tropes you would want in a book <3:",
+        "\n",
+        RelatedCheckBox("picks", "Enemies to Lovers"),
+        "Enemies to Lovers",
+
+        RelatedCheckBox("picks", "Friends to Lovers"),
+        "Friends to Lovers",
+
+        RelatedCheckBox("picks", "Rivals to Lovers"),
+        "Rivals to Lovers",
+
+        RelatedCheckBox("picks", "Grumpy x Sunshine"),
+        "Grumpy x Sunshine",
+
+        RelatedCheckBox("picks", "Opposites Attract"),
+        "Opposites Attract",
+
+        RelatedCheckBox("picks", "Forced Proximity"),
+        "Forced Proximity",
+
+        RelatedCheckBox("picks", "Fake Dating"),
+        "Fake Dating",
+
+        RelatedCheckBox("picks", "Fake Engagement"),
+        "Fake Engagement",
+
+        RelatedCheckBox("picks", "Marriage of Convenience"),
+        "Marriage of Convenience",
+
+        RelatedCheckBox("picks", "Arranged Marriage"),
+        "Arranged Marriage",
+
+        RelatedCheckBox("picks", "Second Chance Romance"),
+        "Second Chance Romance",
+
+        RelatedCheckBox("picks", "Slow Burn"),
+        "Slow Burn",
+
+        RelatedCheckBox("picks", "Love Triangle"),
+        "Love Triangle",
+
+        RelatedCheckBox("picks", "Forbidden Love"),
+        "Forbidden Love",
+
+        RelatedCheckBox("picks", "Friends with Benefits"),
+        "Friends with Benefits",
+
+        RelatedCheckBox("picks", "One Bed"),
+        "One Bed",
+
+        RelatedCheckBox("picks", "He Falls First"),
+        "He Falls First",
+
+        RelatedCheckBox("picks", "She Falls First"),
+        "She Falls First",
+
+        RelatedCheckBox("picks", "Mutual Pining"),
+        "Mutual Pining",
+
+        RelatedCheckBox("picks", "Found Family"),
+        "Found Family",
+
+        RelatedCheckBox("picks", "Small-Town Romance"),
+        "Small-Town Romance",
+
+        RelatedCheckBox("picks", "Secret Identity"),
+        "Secret Identity",
+
+        RelatedCheckBox("picks", "Single Parent"),
+        "Single Parent",
+        
+        "\n",
+
+        Button("Find My Book! 💗", "save_tropes")
+        ]))
+
+@route
+def save_tropes(state: State, picks: list[str]) -> Page:
+    if len(picks) == 0:
+        state.selected_tropes = TROPES
+    else:
+        state.selected_tropes = picks
+    return recommendation_page(state)
+
+@route
+def recommendation_page(state:State)->Page:
+    matching_books = filter_books(
+        state.books,
+        state.selected_genres,
+        state.selected_tropes)
+    
+    if len(matching_books)==0:
+        return Page(state,[
+            Header("No Matching Books :("),
+            "We are so sorry!",
+            Button("Start Over","index")
+            ])
+    
+    state.recommended_book = random.choice(matching_books)
+    book = state.recommended_book
+    
+    return Page(state, [
+        Header("💕 Your Book Match! 💕"),
+        "Title: " + book.title,
+        "\n",
+        "Author: " + book.author,
+        "\n",
+        "Genres: " + ", ".join(book.genres),
+        "\n",
+        "Tropes: " + ", ".join(book.tropes),
+        "\n",
+        Button("New Recommendation", "new_recommendation_page"),
+        Button("Start Over", "index")
+    ])
+
+@route
+def new_recommendation_page(state: State) -> Page:
+    return recommendation_page(state)
+
+from bakery import assert_equal
+
+# Test filter_books
+assert_equal(
+    filter_books(books, ["Contemporary Romance"], ["Enemies to Lovers"]),
+    [book for book in books if "Contemporary Romance" in book.genres
+     and "Enemies to Lovers" in book.tropes]
+)
+
+# Test filter_books with no matches
+assert_equal(
+    filter_books(books, ["Nonexistent Genre"], ["Nonexistent Trope"]),
+    []
+)
+
+# Test save_genres
+state = State(books, [], [], None)
+save_genres(state, ["Contemporary Romance"])
+assert_equal(state.selected_genres, ["Contemporary Romance"])
+
+# Test save_genres with no selections
+state = State(books, [], [], None)
+save_genres(state, [])
+assert_equal(state.selected_genres, GENRES)
+
+# Test save_tropes
+state = State(books, ["Contemporary Romance"], [], None)
+save_tropes(state, ["Enemies to Lovers"])
+assert_equal(state.selected_tropes, ["Enemies to Lovers"])
+
+# Test save_tropes with no selections
+state = State(books, ["Contemporary Romance"], [], None)
+save_tropes(state, [])
+assert_equal(state.selected_tropes, TROPES)
 
 start_server(State(books,[],[],None))
-
