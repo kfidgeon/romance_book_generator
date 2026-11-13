@@ -1,6 +1,7 @@
 from drafter import *
 from dataclasses import dataclass
 import random
+from bakery import assert_equal
 
 @dataclass
 class Book:
