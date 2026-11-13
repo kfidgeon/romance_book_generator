@@ -29,6 +29,7 @@ class State:
     selected_genres: list[str]
     selected_tropes: list[str]
     recommended_book: Book | None
+    recommendation_count: int
 
 
 add_website_css("body", """
@@ -92,7 +93,6 @@ books = [
     Book("The Love Hypothesis", "Ali Hazelwood", ["Contemporary Romance"], ["Fake Dating", "Grumpy x Sunshine", "Forced Proximity"]),
     Book("Love on the Brain", "Ali Hazelwood", ["Contemporary Romance"], ["Enemies to Lovers", "Workplace Romance", "Forced Proximity"]),
     Book("The Bride Test", "Helen Hoang", ["Contemporary Romance"], ["Arranged Marriage", "Opposites Attract"]),
-    Book("The Kiss Quotient", "Helen Hoang", ["Contemporary Romance"], ["Opposites Attract", "Slow Burn"]),
     Book("The Heart Principle", "Helen Hoang", ["Contemporary Romance"], ["Forced Proximity", "Opposites Attract"]),
     Book("The Hating Game", "Sally Thorne", ["Contemporary Romance", "Romantic Comedy"], ["Enemies to Lovers", "Workplace Romance", "Forced Proximity"]),
     Book("Beach Read", "Emily Henry", ["Contemporary Romance"], ["Rivals to Lovers", "Forced Proximity", "Slow Burn"]),
@@ -114,7 +114,6 @@ books = [
     Book("The Switch", "Beth O'Leary", ["Contemporary Romance"], ["Opposites Attract", "Small-Town Romance"]),
     Book("The Road Trip", "Beth O'Leary", ["Contemporary Romance"], ["Second Chance Romance", "Forced Proximity"]),
     Book("The No-Show", "Beth O'Leary", ["Contemporary Romance"], ["Love Triangle", "Slow Burn"]),
-    Book("The Bodyguard", "Katherine Center", ["Contemporary Romance", "Romantic Comedy"], ["Bodyguard Romance", "Forced Proximity", "Opposites Attract"]),
     Book("The Lost Husband", "Katherine Center", ["Contemporary Romance"], ["Small-Town Romance", "Slow Burn"]),
     Book("The Rom-Commers", "Katherine Center", ["Contemporary Romance", "Romantic Comedy"], ["Enemies to Lovers", "Forced Proximity"]),
     Book("The Friend Zone", "Abby Jimenez", ["Contemporary Romance"], ["Friends to Lovers", "Slow Burn"]),
@@ -757,6 +756,7 @@ def recommendation_page(state:State)->Page:
     displays its title, author, genres, and tropes.
     Also gives the user the option to get another recommendation
     or return to the home page.
+    Also returns the number of recomendations the user is receiving
     '''
     matching_books = filter_books(
         state.books,
@@ -771,7 +771,9 @@ def recommendation_page(state:State)->Page:
             ])
     
     state.recommended_book = random.choice(matching_books)
+    state.recommendation_count += 1
     book = state.recommended_book
+    
     
     return Page(state, [
         Header("💕 Your Book Match! 💕"),
@@ -783,6 +785,7 @@ def recommendation_page(state:State)->Page:
         "\n",
         "Tropes: " + ", ".join(book.tropes),
         "\n",
+        "Books recommended so far: " + str(state.recommendation_count),
         Button("New Recommendation", "new_recommendation_page"),
         Button("Start Over", "index")
     ])
@@ -797,39 +800,35 @@ def new_recommendation_page(state: State) -> Page:
     '''
     return recommendation_page(state)
 
-from bakery import assert_equal
 
-# Test filter_books
 assert_equal(
     filter_books(books, ["Contemporary Romance"], ["Enemies to Lovers"]),
     [book for book in books if "Contemporary Romance" in book.genres
      and "Enemies to Lovers" in book.tropes]
 )
 
-# Test filter_books with no matches
 assert_equal(
     filter_books(books, ["Nonexistent Genre"], ["Nonexistent Trope"]),
     []
 )
 
-# Test save_genres
-state = State(books, [], [], None)
+state = State(books, [], [], None,0)
 save_genres(state, ["Contemporary Romance"])
 assert_equal(state.selected_genres, ["Contemporary Romance"])
 
-# Test save_genres with no selections
-state = State(books, [], [], None)
+
+state = State(books, [], [], None,0)
 save_genres(state, [])
 assert_equal(state.selected_genres, GENRES)
 
-# Test save_tropes
-state = State(books, ["Contemporary Romance"], [], None)
+
+state = State(books, ["Contemporary Romance"], [], None,0)
 save_tropes(state, ["Enemies to Lovers"])
 assert_equal(state.selected_tropes, ["Enemies to Lovers"])
 
-# Test save_tropes with no selections
-state = State(books, ["Contemporary Romance"], [], None)
+
+state = State(books, ["Contemporary Romance"], [], None,0)
 save_tropes(state, [])
 assert_equal(state.selected_tropes, TROPES)
 
-start_server(State(books,[],[],None))
+start_server(State(books,[],[],None,0))
